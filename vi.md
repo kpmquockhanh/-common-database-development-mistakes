@@ -46,19 +46,17 @@ Sẽ mất 1 lúc để đảm bảo bạn không tạo ra các dòng bị trùn
 
 Từ [Tại sao tôi ghét DISTINCT](http://weblogs.sqlteam.com/markc/archive/2008/11/11/60752.aspx):
 
-> Where things start to go sour in my opinion is when a developer is building substantial query, joining tables together, and all of a sudden he realizes that it **looks** like he is getting duplicate (or even more) rows and his immediate response...his "solution" to this "problem" is to throw on the DISTINCT keyword and **POOF** all his troubles go away.
+>Trong trường hợp mọi thứ bắt đầu trở nên chua theo quản điểm ​​của tôi là khi một nhà phát triển đang xây dựng truy vấn đáng kể, tham gia các bảng với nhau, và đột nhiên ông nhận ra rằng có vẻ như ông đang nhận được bản sao (hoặc thậm chí nhiều hơn) hàng và phản ứng ngay lập tức của ông "giải pháp" của anh ta đối với "vấn đề" này là ném vào từ khoá DISTINCT và **POOF** tất cả những rắc rối của anh ấy biến mất.
 
-**5. Favouring aggregation over joins**
+**5. Khuyến khích tập hợp các kết nối**
 
-Another common mistake by database application developers is to not realize how much more expensive aggregation (ie the 
+Một sai lầm phổ biến khác của các nhà phát triển ứng dụng cơ sở dữ liệu là không nhận ra sự kết hợp  ( Mệnh đề GROUP BY) tốn kém hơn so sánh với phép nối..
 
-GROUP BY clause) can be compared to joins.
+Để cung cấp cho bạn một ý tưởng về cách phổ thông này, tôi đã viết về chủ đề này nhiều lần ở đây và được downvoted rất nhiều cho nó. Ví dụ:
 
-To give you an idea of how widespread this is, I've written on this topic several times here and been downvoted a lot for it. For example:
+Từ [SQL statement - “join” vs “group by and having”](https://stackoverflow.com/questions/477006/sql-statement-join-vs-group-by-and-having/477013#477013):
 
-From [SQL statement - “join” vs “group by and having”](https://stackoverflow.com/questions/477006/sql-statement-join-vs-group-by-and-having/477013#477013):
-
-> First query:
+> Câu truy vấn thứ nhất:
 
 SELECT userid
 FROM userrole
@@ -68,7 +66,7 @@ HAVING COUNT(1) = 3
 
 > Query time: 0.312 s
 
-> Second query:
+> Câu truy vấn thứ hai:
 
 SELECT t1.userid
 FROM userrole t1
@@ -78,25 +76,25 @@ AND t1.roleid = 1
 
 > Query time: 0.016 s
 
-> That's right. The join version I proposed is **twenty times faster than the aggregate version.**
+> Đúng vậy. Phiên bản nối tôi đề xuất **nhanh gấp 2 lần phiên bản nhóm**
 
-**6. Not simplifying complex queries through views**
+**6. Không đơn giản hóa các truy vấn phức tạp thông qua các chế độ xem**
 
-Not all database vendors support views but for those that do, they can greatly simplify queries if used judiciously. For example, on one project I used a [generic Party model](http://www.tdan.com/view-articles/5014/) for CRM. This is an extremely powerful and flexible modelling technique but can lead to many joins. In this model there were:
+Không phải tất cả các nhà cung cấp cơ sở dữ liệu hỗ trợ quan điểm nhưng đối với những người làm, họ có thể rất đơn giản hóa các truy vấn nếu được sử dụng một cách thận trọng. Ví dụ, trong một dự án tôi đã dùng [generic Party model](http://www.tdan.com/view-articles/5014/) cho CRM. Đây là một kỹ thuật mô hình rất mạnh và linh hoạt nhưng có thể dẫn đến nhiều phép nối. Trong mô hình này có:
 
-- **Party**: people and organisations;
-- **Party Role**: things those parties did, for example Employee and Employer;
-- **Party Role Relationship**: how those roles related to each other.
+- **Party**: người và tổ chức;
+- **Party Role**: những điều mà các bên đã làm, ví dụ như Nhân viên và Người sử dụng lao động;
+- **Party Role Relationship**: làm thế nào những vai trò liên quan đến nhau.
 
-Example:
+Ví dụ:
 
-- Ted is a Person, being a subtype of Party;
-- Ted has many roles, one of which is Employee;
-- Intel is an organisation, being a subtype of a Party;
-- Intel has many roles, one of which is Employer;
-- Intel employs Ted, meaning there is a relationship between their respective roles.
+- Ted là 1 Person, là 1 tập con Party;
+- Ted có nhiều luật, 1 trong số chúng là Employee;
+- Intel là 1 tổ chức, là 1 tập con cửa Party;
+- Intel có nhiều luật, 1 trong số chúng là Employer;
+- Intel tuyển Ted, nghĩa là có quan hệ giữa các luật tương ứng của chúng.
 
-So there are five tables joined to link Ted to his employer. You assume all employees are Persons (not organisations) and provide this helper view:
+Do vậy, có 5 bảng nối để kếtết nối Ted với các nhà tuyển dụng của anh ý.Giả định rằng các nhân viên là Persons(không phải các tổ chức) và cung cấp các view hỗ trợ:
 
 CREATE VIEW vw_employee AS
 SELECT p.title, p.given_names, p.surname, p.date_of_birth, p2.party_name employer_name
@@ -107,19 +105,19 @@ JOIN party_role_relationship prr ON child.id = prr.child_id AND prr.type = 'EMPL
 JOIN party_role parent ON parent.id = prr.parent_id = parent.id
 JOIN party p2 ON parent.party_id = p2.id
 
-And suddenly you have a very simple view of the data you want but on a highly flexible data model.
+Và bỗng nhiên bạn có 1 view rất đơn giản các dữ liệu bạn muốn những ở mô hình dữ liệu linh hoạt cao.
 
-**7. Not sanitizing input**
+**7. Không lọc đầu vào**
 
-This is a huge one. Now I like PHP but if you don't know what you're doing it's really easy to create sites vulnerable to attack. Nothing sums it up better than the [story of little Bobby Tables](http://xkcd.com/327/).
+Đây là 1 chuyện lớn đấy. Bây giờ tôi thích PHP nhưng nếu bạn không muốn biết bạn đang làm gì nó thực sự dễ dàng trong việc tạo các site có thể bị tấn công. Không cái nào tổng kết điều này tốt hơn là  [câu chuyện của Bobby Tables bé nhỏ](http://xkcd.com/327/).
 
-Data provided by the user by way of URLs, form data **and cookies** should always be treated as hostile and sanitized. Make sure you're getting what you expect.
+Dữ liệu được cung cấp bởi người sử dụng bằng các URL, hình thức dữ liệu và cookie nên luôn được coi là có tính thù địch và lọc. Đảm bảo bạn đang nhận được những gì bạn mong đợi.
 
-**8. Not using prepared statements**
+**8. Không sử dụng các câu lệnh chuẩn bị**
 
-Prepared statements are when you compile a query minus the data used in inserts, updates and 
+Các câu lệnh chuẩn bị là khi bạn biên dịch 1 truy vấn khuyết dữ liệu sử dụng trong các lệnh thêm, cập nhật và
 
-WHERE clauses and then supply that later. For example:
+mệnh đề WHERE và sẽ cung cấp dữ liệu cho nó sau. Ví dụ:
 
 SELECT * FROM users WHERE username = 'bob'
 
@@ -131,13 +129,13 @@ or
 
 SELECT * FROM users WHERE username = :username
 
-depending on your platform.
+dựa trên nền tảng của bạn.
 
-I've seen databases brought to their knees by doing this. Basically, each time any modern database encounters a new query it has to compile it. If it encounters a query it's seen before, you're giving the database the opportunity to cache the compiled query and the execution plan. By doing the query a lot you're giving the database the opportunity to figure that out and optimize accordingly (for example, by pinning the compiled query in memory).
+Tôi đã từng thấy các cơ sở dữ liệu bị phá hủy vì điều này. Về cơ bản, mỗi khi cơ sở dữ liệu hiện đại gặp một truy vấn mới, nó phải biên dịch nó. Nếu nó gặp một truy vấn nó được nhìn thấy trước, bạn đang cho cơ sở dữ liệu cơ hội để cache truy vấn biên dịch và kế hoạch thực hiện. Bằng cách thực hiện các truy vấn rất nhiều bạn đang cho cơ sở dữ liệu cơ hội để tìm kiếm và tối ưu hóa cho phù hợp (ví dụ, bằng cách ghim các truy vấn biên dịch trong bộ nhớ).
 
-Using prepared statements will also give you meaningful statistics about how often certain queries are used.
+Sử dụng các câu lệnh chuẩn bị cũng sẽ cung cấp cho bạn số liệu thống kê có ý nghĩa về tần suất các truy vấn nhất định được sử dụng.
 
-Prepared statements will also better protect you against SQL injection attacks.
+Các câu lệnh được chuẩn bị cũng bảo vệ bạn tốt hơn với cách tấn công SQL injection.
 
 **9. Not normalizing enough**
 
