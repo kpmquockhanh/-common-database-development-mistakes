@@ -10,17 +10,17 @@ _nguồn https://stackoverflow.com/questions/621884/database-development-mistake
 
 Cơ sở dữ liệu của bạn có thể thay đổi ở đây nhưng nếu cơ sở dữ liệu của bạn hỗ trợ tính toàn vẹn tham chiếu - có nghĩa là tất cả các khoá ngoại được đảm bảo để trỏ đến một thực thể tồn tại - bạn nên sử dụng nó
 
-Rất phổ biến để thấy sự thất bại này trên cơ sở dữ liệu MySQL. Tôi không tin rằng MyISAM hỗ trợ nó. Nhưng InnoDB thì có. Bạn sẽ tìm thấy những người đang sử dụng MyISAM hoặc những người đang sử dụng InnoDB nhưng không sử dụng nó anyway.
+Rất phổ biến để thấy sai lầm này trên cơ sở dữ liệu MySQL. Tôi không tin rằng MyISAM hỗ trợ nó. Nhưng InnoDB thì có. Bạn sẽ tìm thấy những người đang sử dụng MyISAM hoặc những người đang sử dụng InnoDB nhưng không còn sử dụng nó.
 
 Đọc thêm:
 
-- [How important are constraints like NOT NULL and FOREIGN KEY if I’ll always control my database input with php?](https://stackoverflow.com/questions/382309/how-important-are-constraints-like-not-null-and-foreign-key-if-ill-always-contr)
-- [Are foreign keys really necessary in a database design?](https://stackoverflow.com/questions/18717/are-foreign-keys-really-necessary-in-a-database-design)
-- [Are foreign keys really necessary in a database design?](http://www.diovo.com/2008/08/are-foreign-keys-really-necessary-in-a-database-design/)
+- [Các ràng buộc như NOT NULL và FOREIGN KEY quan trọng như thế nào nếu bạn thường xuyên phải kiểm soát đầu vào với php?](https://stackoverflow.com/questions/382309/how-important-are-constraints-like-not-null-and-foreign-key-if-ill-always-contr)
+- [Các khoá ngoại có thực sự cần thiết trong thiết kế cơ sở dữ liệu?](https://stackoverflow.com/questions/18717/are-foreign-keys-really-necessary-in-a-database-design)
+- [Các khoá ngoại có cần thiết trong thiết kế cơ sở dữ liệu?](http://www.diovo.com/2008/08/are-foreign-keys-really-necessary-in-a-database-design/)
 
 **3. Sử dụng khóa tự nhiên thay vì (kỹ thuật) khóa chính đại diện**
 
-Khóa tự nhiên là các khóa dựa trên các dữ liệu có nghĩa bên ngoài mà (có vẻ) độc nhất. Các ví dụ phổ biến là mã sản phẩm, mã bưu điện gồm hai chữ cái (US), số an sinh xã hội. Các khóa chính thay thế hoặc kỹ thuật chính là những khoá hoàn toàn không có ý nghĩa bên ngoài hệ thống. Chúng được phát minh hoàn toàn để xác định thực thể và thông thường các trường tự động gia tăng (SQL Server, MySQL, và những cái khác) hoặc các chuỗi (nhất là Oracle).
+Khóa tự nhiên là các khóa dựa trên các dữ liệu có nghĩa bên ngoài mà (có vẻ) duy nhất. Các ví dụ phổ biến là mã sản phẩm, mã bưu điện gồm hai chữ cái (US), số an sinh xã hội. Các khóa bao quát (đại diện) hoặc kỹ thuật là những khoá hoàn toàn không có ý nghĩa bên ngoài hệ thống. Chúng được phát minh hoàn toàn để xác định thực thể và thông thường các trường tự tăng (Auto-increament) (SQL Server, MySQL, và những cái khác) hoặc các chuỗi (nhất là Oracle).
 
 Quan điểm của tôi là bạn nên **luôn** sử dụng khóa chính đại diện. Vấn đề này đã đưa ra trong những câu hỏi sau:
 
@@ -30,11 +30,11 @@ Quan điểm của tôi là bạn nên **luôn** sử dụng khóa chính đại
 - [Surrogate vs. natural/business keys](https://stackoverflow.com/questions/63090/surrogate-vs-natural-business-keys)
 - [Should I have a dedicated primary key field?](https://stackoverflow.com/questions/166750/should-i-have-a-dedicated-primary-key-field)
 
-Đây là một chủ đề gây nhiều tranh cãi mà bạn sẽ không nhận được thỏa thuận chung. Trong khi bạn có thể tìm thấy một số người, những người nghĩ rằng các khóa tự nhiên trong một số trường hợp OK, bạn sẽ không tìm thấy bất kỳ lời chỉ trích của các khóa đại diện khác hơn là cho là không cần thiết. Đó là một nhược điểm nhỏ nếu bạn hỏi tôi.
+Đây là một chủ đề gây nhiều tranh cãi mà bạn sẽ không nhận được thỏa thuận chung. Trong khi bạn có thể tìm thấy một số người, những người nghĩ rằng các khóa tự nhiên trong một số trường hợp OK, bạn sẽ không tìm thấy bất kỳ lời chỉ trích của các khóa đại diện khác hơn cho là không cần thiết. Đó là một nhược điểm nhỏ nếu bạn hỏi tôi.
 
 Hãy nhớ rằng, ngay cả [các quốc gia có thể không còn tồn tại](http://en.wikipedia.org/wiki/ISO_3166-1) (ví dụ, Yugoslavia).
 
-**4. Viết các truy vấn yêu cầu 
+**4. Viết các yêu cầu truy vấn
 
 để DISTINCT hoạt động**
 
@@ -46,7 +46,7 @@ Sẽ mất 1 lúc để đảm bảo bạn không tạo ra các dòng bị trùn
 
 Từ [Tại sao tôi ghét DISTINCT](http://weblogs.sqlteam.com/markc/archive/2008/11/11/60752.aspx):
 
->Trong trường hợp mọi thứ bắt đầu trở nên chua theo quản điểm ​​của tôi là khi một nhà phát triển đang xây dựng truy vấn đáng kể, tham gia các bảng với nhau, và đột nhiên ông nhận ra rằng có vẻ như ông đang nhận được bản sao (hoặc thậm chí nhiều hơn) hàng và phản ứng ngay lập tức của ông "giải pháp" của anh ta đối với "vấn đề" này là ném vào từ khoá DISTINCT và **POOF** tất cả những rắc rối của anh ấy biến mất.
+>Trong trường hợp mọi thứ bắt đầu trở nên không theo ý kiến của tôi là khi một nhà phát triển đang xây dựng một lượng đáng kể các truy vấn, join các bảng với nhau, và đột nhiên anh ta nhận ra rằng có vẻ như anh ta đang nhận được bản sao (hoặc thậm chí nhiều hơn)các hàng và phản ứng ngay lập tức của anh ta... "giải pháp" của anh ta đối với "vấn đề" này là ném vào từ khoá DISTINCT và **POOF** tất cả những rắc rối của anh ấy biến mất.
 
 **5. Khuyến khích tập hợp các kết nối**
 
@@ -78,7 +78,7 @@ AND t1.roleid = 1
 
 > Đúng vậy. Phiên bản nối tôi đề xuất **nhanh gấp 2 lần phiên bản nhóm**
 
-**6. Không đơn giản hóa các truy vấn phức tạp thông qua các chế độ xem**
+**6. Không đơn giản hóa các truy vấn phức tạp thông qua các view**
 
 Không phải tất cả các nhà cung cấp cơ sở dữ liệu hỗ trợ quan điểm nhưng đối với những người làm, họ có thể rất đơn giản hóa các truy vấn nếu được sử dụng một cách thận trọng. Ví dụ, trong một dự án tôi đã dùng [generic Party model](http://www.tdan.com/view-articles/5014/) cho CRM. Đây là một kỹ thuật mô hình rất mạnh và linh hoạt nhưng có thể dẫn đến nhiều phép nối. Trong mô hình này có:
 
@@ -113,7 +113,7 @@ Và bỗng nhiên bạn có 1 view rất đơn giản các dữ liệu bạn mu�
 
 Dữ liệu được cung cấp bởi người sử dụng bằng các URL, hình thức dữ liệu và cookie nên luôn được coi là có tính thù địch và lọc. Đảm bảo bạn đang nhận được những gì bạn mong đợi.
 
-**8. Không sử dụng các câu lệnh chuẩn bị**
+**8. Không sử dụng các câu lệnh được chuẩn bị**
 
 Các câu lệnh chuẩn bị là khi bạn biên dịch 1 truy vấn khuyết dữ liệu sử dụng trong các lệnh thêm, cập nhật và
 
@@ -129,7 +129,7 @@ or
 
 SELECT * FROM users WHERE username = :username
 
-dựa trên nền tảng của bạn.
+tuỳ thuộc vào nền tảng của bạn.
 
 Tôi đã từng thấy các cơ sở dữ liệu bị phá hủy vì điều này. Về cơ bản, mỗi khi cơ sở dữ liệu hiện đại gặp một truy vấn mới, nó phải biên dịch nó. Nếu nó gặp một truy vấn nó được nhìn thấy trước, bạn đang cho cơ sở dữ liệu cơ hội để cache truy vấn biên dịch và kế hoạch thực hiện. Bằng cách thực hiện các truy vấn rất nhiều bạn đang cho cơ sở dữ liệu cơ hội để tìm kiếm và tối ưu hóa cho phù hợp (ví dụ, bằng cách ghim các truy vấn biên dịch trong bộ nhớ).
 
